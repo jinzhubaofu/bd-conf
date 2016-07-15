@@ -1,0 +1,21 @@
+{
+  "name": "bd-configure",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jasmine JASMINE_CONFIG_PATH=test/support/jasmine.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://lupengyu@icode.baidu.com:8235/baidu/mms/bd-configure"
+  },
+  "keywords": [
+    "configure"
+  ],
+  "author": "lupengyu@baidu.com",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^2.4.1"
+  }
+}
