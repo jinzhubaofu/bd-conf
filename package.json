@@ -1,19 +1,20 @@
 {
   "name": "bd-conf",
   "version": "1.0.0",
-  "description": "",
+  "description": "bd conf parser",
   "main": "src/index.js",
   "scripts": {
     "test": "istanbul cover jasmine JASMINE_CONFIG_PATH=test/support/jasmine.json"
   },
   "repository": {
     "type": "git",
-    "url": "ssh://lupengyu@icode.baidu.com:8235/baidu/mms/bd-configure"
+    "url": "git@github.com:jinzhubaofu/bd-conf.git"
   },
   "keywords": [
     "configure"
   ],
-  "author": "lupengyu@baidu.com",
+  "homepage": "https://github.com/jinzhubaofu/bd-conf",
+  "author": "leonlu@outlook.com",
   "license": "ISC",
   "devDependencies": {
     "istanbul": "^0.4.4",
