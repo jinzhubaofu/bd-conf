@@ -1,5 +1,7 @@
 # bd conf
 
+[![Build Status](https://travis-ci.org/jinzhubaofu/bd-conf.svg?branch=master)](https://travis-ci.org/jinzhubaofu/bd-conf)
+
 a parser for bd conf
 
 ## requirement
