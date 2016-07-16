@@ -8,15 +8,15 @@ const COMMAND_TYPES = require('./constants.js').command;
 const REG_GROUP = /^\[[\w@.]+\]$/;
 
 // [GLOBAL]
-const REG_GLOBAL_GROUP = /^\[GLOBAL\]$/;
+const REG_GLOBAL_GROUP = /^GLOBAL$/;
 
 // [a] [a.b.c]
 // 绝对路径
-const REG_ABSOLUTE_OBJECT_GROUP = /^((\.\w+)*)(\.@?\w+)$/;
+const REG_ABSOLUTE_OBJECT_GROUP = /^((\.\w+)*)\.(@?)(\w+)$/;
 
 // [.a] | [..a]
 // 相对路径
-const REG_RELATIVE_OBJECT_GROUP = /^((\.(\w+)?)*)(\.@?\w+)$/;
+const REG_RELATIVE_OBJECT_GROUP = /^((\.(\w+)?)*)\.(@?)(\w+)$/;
 
 // key: value | @key: value
 const REG_KEY_VALUE = /^(@?)(\w+)\s*:\s*([^\n]*)$/;
@@ -25,10 +25,6 @@ const REG_KEY_VALUE = /^(@?)(\w+)\s*:\s*([^\n]*)$/;
 const REG_COMMENT = /^#/;
 
 function parseCommand(command, index) {
-
-    if (!command) {
-        return null;
-    }
 
     if (REG_COMMENT.test(command)) {
         return {
@@ -39,19 +35,25 @@ function parseCommand(command, index) {
 
     if (REG_KEY_VALUE.test(command)) {
 
-        return RegExp.$1
+        const multiple = RegExp.$1;
+        const key = RegExp.$2;
+        let value = RegExp.$3;
+
+        value = /^"([\w\W]*)"/.test(value) ? value.slice(1, -1) : value;
+
+        return multiple
             ? {
                 command,
                 type: COMMAND_TYPES.ARRAY_KEY_VALUE,
-                key: RegExp.$2,
-                value: RegExp.$3,
+                key,
+                value,
                 lineNo: index
             }
             : {
                 command,
                 type: COMMAND_TYPES.OBJECT_KEY_VALUE,
-                key: RegExp.$2,
-                value: RegExp.$3,
+                key,
+                value,
                 lineNo: index
             };
 
@@ -68,25 +70,37 @@ function parseCommand(command, index) {
             };
         }
 
+        if (REG_RELATIVE_OBJECT_GROUP.test(group)) {
+
+            return {
+                type: COMMAND_TYPES.RELATIVE_OBJECT_GROUP,
+                command,
+                path: group
+                    .split('.')
+                    .map(function (item) {
+                        return item[0] === '@' ? item.slice(1) : item;
+                    }),
+                multiple: !!RegExp.$4,
+                lineNo: index
+            };
+
+        }
+
         if (REG_ABSOLUTE_OBJECT_GROUP.test('.' + group)) {
+
             return {
                 type: COMMAND_TYPES.ABSOLUTE_OBJECT_GROUP,
                 command,
-                path: group.split('.'),
-                multiple: false,
+                path: group
+                    .split('.')
+                    .map(function (item) {
+                        return item[0] === '@' ? item.slice(1) : item;
+                    }),
+                multiple: !!RegExp.$3,
                 lineNo: index
             };
         }
 
-        if (REG_RELATIVE_OBJECT_GROUP.test(group)) {
-            return {
-                type: COMMAND_TYPES.RELATIVE_OBJECT_GROUP,
-                command,
-                path: command.slice(1, -1).split('.'),
-                multiple: false,
-                lineNo: index
-            };
-        }
 
     }
 

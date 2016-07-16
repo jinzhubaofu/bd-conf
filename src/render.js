@@ -5,13 +5,6 @@
 
 const COMMAND_TYPES = require('./constants.js').command;
 
-function createScope(scope, path, isArray) {
-
-
-
-
-}
-
 // 策略
 //
 // 1. [a] / [@a] root 切换指令
@@ -35,27 +28,70 @@ function createScope(scope, path, isArray) {
 
 function mergeGroup(root, currentPath, command) {
 
-    const nextScope = command.path.reduce(
+    const multiple = command.multiple;
+
+    const nextPath = command.path.map(function (item, index) {
+
+        item = item || currentPath[index];
+
+        if (item == null) {
+            throw new Error(''
+                + 'invalid context: ' + command.command + ' '
+                + 'lineNo:' + (command.lineNo + 1)
+            );
+        }
+
+        return item;
+
+    });
+
+    const nextScope = nextPath.reduce(
         function (scope, item, index, items) {
 
-            item = item || currentPath[index];
 
-            if (!item || index < items.length - 1 && scope[item] == null) {
-                throw new Error('invalid context: ' + command.command + ' lineNo:' + command.lineNo);
+            if (index < items.length - 1 && scope[item] == null) {
+                throw new Error(''
+                    + 'invalid context: ' + command.command + ' '
+                    + 'lineNo:' + (command.lineNo + 1)
+                );
             }
 
-            if (scope[item] == null) {
-                scope[item] = command.multiple ? [] : {};
+            // 最后一级为空，那么创建一个新的域。
+            if (index === items.length - 1) {
+
+                if (scope[item] == null) {
+                    scope[item] = multiple ? [] : {};
+                }
+
+                // 如果是数组，那么在数组末尾放一个新的域，并把域直接向数组的最后一个元素
+                if (multiple) {
+                    scope[item].push({});
+                }
+
             }
 
-            return scope[item];
+            // 指向到下一级
+            scope = scope[item];
+
+            if (Array.isArray(scope)) {
+                scope = scope[scope.length - 1];
+            }
+
+            return scope;
 
         },
         root
     );
 
-    return nextScope;
+    return {
+        scope: nextScope,
+        path: nextPath
+    };
 
+}
+
+function setProperty(scope, key, value) {
+    scope[key] = value;
 }
 
 function render(commands) {
@@ -71,24 +107,35 @@ function render(commands) {
         switch (command.type) {
 
             case COMMAND_TYPES.OBJECT_KEY_VALUE:
-                currentScope[command.key] = command.value;
+                setProperty(currentScope, command.key, command.value);
                 break;
 
             case COMMAND_TYPES.ARRAY_KEY_VALUE:
+
                 const key = command.key;
                 const value = command.value;
-                if (!Array.isArray(currentScope[key])) {
-                    currentScope[key] = [value];
-                }
-                else {
+
+                if (Array.isArray(currentScope[key])) {
                     currentScope[key].push(value);
                 }
+                else {
+                    currentScope[key] = [value];
+                }
+
                 break;
 
             case COMMAND_TYPES.ABSOLUTE_OBJECT_GROUP:
             case COMMAND_TYPES.RELATIVE_OBJECT_GROUP:
-                currentScope = mergeGroup(root, currentPath, command);
-                currentPath = command.path;
+
+                const merged = mergeGroup(root, currentPath, command);
+                currentPath = merged.path;
+                currentScope = merged.scope;
+
+                break;
+
+            case COMMAND_TYPES.GLOBAL_GROUP:
+                currentPath = [];
+                currentScope = root;
                 break;
 
             case COMMAND_TYPES.COMMENT:
@@ -97,10 +144,9 @@ function render(commands) {
 
     }
 
+
     return root;
 
 }
 
-module.exports = function (commands, scope) {
-    return render(commands, {}, 0);
-};
+module.exports = render;
