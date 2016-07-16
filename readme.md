@@ -1,6 +1,7 @@
 # bd conf
 
 [![Build Status](https://travis-ci.org/jinzhubaofu/bd-conf.svg?branch=master)](https://travis-ci.org/jinzhubaofu/bd-conf)
+[![Coverage Status](https://coveralls.io/repos/github/jinzhubaofu/bd-conf/badge.svg?branch=master)](https://coveralls.io/github/jinzhubaofu/bd-conf?branch=master)
 
 a parser for bd conf
 

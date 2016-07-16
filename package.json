@@ -4,7 +4,8 @@
   "description": "bd conf parser",
   "main": "src/index.js",
   "scripts": {
-    "test": "istanbul cover jasmine JASMINE_CONFIG_PATH=test/support/jasmine.json"
+    "test": "istanbul cover jasmine JASMINE_CONFIG_PATH=test/support/jasmine.json",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   "author": "leonlu@outlook.com",
   "license": "ISC",
   "devDependencies": {
+    "coveralls": "^2.11.11",
     "istanbul": "^0.4.4",
     "jasmine": "^2.4.1"
   }
