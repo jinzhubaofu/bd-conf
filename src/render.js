@@ -3,28 +3,18 @@
  * @author leon <lupengyu@baidu.com>
  */
 
+'use strict';
+
 const COMMAND_TYPES = require('./constants.js').command;
 
 // 策略
 //
-// 1. [a] / [@a] root 切换指令
-// 时切换 root；默认的 root 是 GLOBAL(object);
-// [a] 的 scope 是 object；[@a] 的 scope 是 array;
+// **这个格式不能表达出 [[], [], []]**
 //
-// 2. [a.b.c] 绝对路径指令
-// 不切换 root，直接对绝对路径指定的域上修改
-// 绝对路径中的任意一级不存在，就挂掉
-//
-// 3. [.a] [.@a] [..a] [...a] [..@a] [...@a]
-//
-// 这种相当于 [R.R1.R2.R3...Rn.a]，会将作用域切换为 [R.R1.R2.R3...Rn.a]
-//
-// [.a] 是 object; [.@a] 是 array;
-// 这种相当于从当前 scope 向下相找 n 级 sub scope；
-// 如果 n-1 级子域中任意一级不存在，那就挂掉
-//
-// 4. [.a.b]
-// 这种相当于 [R.a.b]
+// 其实这个格式的 GROUP 就是使用一个数组记录当前 json pointer
+// [a.b.c.d] 表达一个 json pointer，在这个 json pointer 指定的位置是一个 object
+// [...d] 则是一个 json pointer 简略写法；如果当前的 pointer 是 [a.b.c]，那么 [...d] 就是 [a.b.c.d]
+// 对于数组，json pointer 的最后一节的 key 加 @ 前缀；
 
 function mergeGroup(root, currentPath, command) {
 

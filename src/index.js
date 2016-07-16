@@ -3,6 +3,8 @@
  * @author leon <lupengyu@baidu.com>
  */
 
+'use strict';
+
 const parse = require('./parse.js');
 const render = require('./render.js');
 

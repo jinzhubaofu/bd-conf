@@ -3,6 +3,8 @@
  * @author leon <lupengyu@baidu.com>
  */
 
+'use strict';
+
 const COMMAND_TYPES = require('./constants.js').command;
 
 const REG_GROUP = /^\[[\w@.]+\]$/;

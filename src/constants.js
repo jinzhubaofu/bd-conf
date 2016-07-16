@@ -3,6 +3,8 @@
  * @author leon <lupengyu@baidu.com>
  */
 
+'use strict';
+
 module.exports = {
 
     // 命令类型

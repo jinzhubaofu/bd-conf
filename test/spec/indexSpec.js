@@ -3,6 +3,8 @@
  * @author leon<ludafa@kavout.com>
  */
 
+'use strict';
+
 const BDConf = require('../../src/index.js');
 const parse = BDConf.parse;
 
